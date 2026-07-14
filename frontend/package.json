@@ -1,0 +1,10 @@
+{
+  "name": "marketlens-frontend",
+  "private": true,
+  "scripts": {
+    "test": "node tests/dom.test.js"
+  },
+  "devDependencies": {
+    "jsdom": "^24.1.3"
+  }
+}

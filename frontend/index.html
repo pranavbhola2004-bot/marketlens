@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MarketLens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Libre+Baskerville:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/config.js"></script>
+</head>
+<body>
+<div class="scanlines" aria-hidden="true"></div>
+<div class="wrap">
+
+  <header>
+    <div class="word">MarketLens <span>TERMINAL</span></div>
+    <p class="tagline">Live screening · peer comparison · relative valuation · NSE coverage</p>
+
+    <div id="index-strip" class="index-strip"></div>
+    <div class="marquee"><div class="marquee-track" id="marquee"></div></div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" data-panel="screener">01 · SCREENER</div>
+    <div class="tab" data-panel="peers">02 · PEERS</div>
+    <div class="tab" data-panel="valuation">03 · VALUATION</div>
+    <div class="tab" data-panel="movers">04 · MOVERS</div>
+    <div class="tab" data-panel="indices">05 · INDICES</div>
+    <div class="tab" data-panel="watchlist">06 · WATCHLIST</div>
+  </div>
+
+  <!-- SCREENER -->
+  <div class="panel active" id="panel-screener">
+    <div class="controls">
+      <div class="ctl">
+        <label>Max P/E</label>
+        <input type="range" id="f-pe" min="5" max="80" value="80">
+        <span class="val" id="f-pe-val">≤ 80x</span>
+      </div>
+      <div class="ctl">
+        <label>Min ROE</label>
+        <input type="range" id="f-roe" min="0" max="35" value="0">
+        <span class="val" id="f-roe-val">≥ 0%</span>
+      </div>
+      <div class="ctl">
+        <label>Max Debt/Equity</label>
+        <input type="range" id="f-de" min="0" max="200" value="200">
+        <span class="val" id="f-de-val">≤ 200%</span>
+      </div>
+      <div class="ctl">
+        <label>Min Profit Margin</label>
+        <input type="range" id="f-margin" min="0" max="30" value="0">
+        <span class="val" id="f-margin-val">≥ 0%</span>
+      </div>
+      <div class="ctl">
+        <label>Sector</label>
+        <select id="f-sector"><option value="">All sectors</option></select>
+      </div>
+    </div>
+    <div class="count" id="screener-count"></div>
+    <table>
+      <thead><tr>
+        <th data-k="ticker">Ticker</th><th data-k="name">Company</th><th data-k="sector">Sector</th>
+        <th data-k="price" class="num">Price</th>
+        <th data-k="change_pct" class="num">Change</th>
+        <th data-k="pe_ttm" class="num">P/E</th><th data-k="pb" class="num">P/B</th>
+        <th data-k="roe" class="num">ROE</th><th data-k="debt_to_equity" class="num">D/E</th>
+        <th data-k="profit_margin" class="num">Net Margin</th>
+      </tr></thead>
+      <tbody id="screener-body"></tbody>
+    </table>
+  </div>
+
+  <!-- PEER COMPARISON -->
+  <div class="panel" id="panel-peers">
+    <div class="controls">
+      <div class="ctl">
+        <label>Sector</label>
+        <select id="peer-sector"></select>
+      </div>
+      <div class="ctl">
+        <label>Metric</label>
+        <select id="peer-metric">
+          <option value="pe_ttm">P/E</option>
+          <option value="pb">P/B</option>
+          <option value="ev_ebitda">EV/EBITDA</option>
+        </select>
+      </div>
+    </div>
+    <div class="chart-card">
+      <p class="chart-title" id="peer-title">—</p>
+      <p class="chart-sub">Amber tick marks the sector average. Click a ticker for detail.</p>
+      <div id="peer-chart"></div>
+    </div>
+  </div>
+
+  <!-- VALUATION -->
+  <div class="panel" id="panel-valuation">
+    <div class="count" id="valuation-count"></div>
+    <table>
+      <thead><tr>
+        <th data-k="ticker">Ticker</th><th data-k="name">Company</th><th data-k="sector">Sector</th>
+        <th data-k="price" class="num">Price</th>
+        <th data-k="pe_ttm" class="num">P/E</th><th data-k="pb" class="num">P/B</th>
+        <th>Spectrum (vs peers)</th><th>Flag</th>
+      </tr></thead>
+      <tbody id="valuation-body"></tbody>
+    </table>
+  </div>
+
+  <!-- MOVERS & HEATMAP -->
+  <div class="panel" id="panel-movers">
+    <div class="movers-grid">
+      <div class="chart-card">
+        <p class="chart-title">Top gainers</p>
+        <table class="mini"><tbody id="gainers-body"></tbody></table>
+      </div>
+      <div class="chart-card">
+        <p class="chart-title">Top losers</p>
+        <table class="mini"><tbody id="losers-body"></tbody></table>
+      </div>
+    </div>
+    <div class="chart-card" style="margin-top:14px;">
+      <p class="chart-title">Sector heatmap</p>
+      <p class="chart-sub">Average % change today, by sector.</p>
+      <div id="heatmap-grid" class="heatmap-grid"></div>
+    </div>
+  </div>
+
+  <!-- INDICES -->
+  <div class="panel" id="panel-indices">
+    <p class="chart-sub" style="margin-bottom:16px;">NSE benchmarks and sectoral indices. India VIX is a volatility gauge — bands show calm / elevated / high.</p>
+    <div id="indices-grid" class="indices-grid"></div>
+  </div>
+
+  <!-- WATCHLIST -->
+  <div class="panel" id="panel-watchlist">
+    <div class="controls">
+      <div class="ctl" style="min-width:220px;">
+        <label>Add ticker (e.g. TCS.NS)</label>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="wl-input" placeholder="TICKER.NS" style="flex:1; padding:7px 9px;">
+          <button id="wl-add-btn" class="btn">Add</button>
+        </div>
+      </div>
+    </div>
+    <table>
+      <thead><tr><th>Ticker</th><th>Company</th><th>Sector</th><th class="num">Price</th><th class="num">Change</th><th class="num">P/E</th><th></th></tr></thead>
+      <tbody id="watchlist-body"></tbody>
+    </table>
+    <p class="empty-note" id="watchlist-empty">Your watchlist is empty — add a ticker above.</p>
+  </div>
+
+  <footer>MarketLens · FastAPI + yfinance · cache TTL 5 min</footer>
+</div>
+
+<!-- Company detail modal -->
+<div id="modal-overlay" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-close" id="modal-close">✕</div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/screener.js"></script>
+<script src="js/peers.js"></script>
+<script src="js/valuation.js"></script>
+<script src="js/indices.js"></script>
+<script src="js/watchlist.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

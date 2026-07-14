@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "buildCommand": "node -e \"const fs=require('fs');const b=process.env.MARKETLENS_API_BASE||'';fs.writeFileSync('js/config.js','window.MARKETLENS_API_BASE='+JSON.stringify(b)+';\\n');\"",
+  "outputDirectory": ".",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    }
+  ]
+}
